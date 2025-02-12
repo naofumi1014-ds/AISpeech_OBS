@@ -1,0 +1,4 @@
+# obsに表示する字幕を生成する
+from AISpeech import continuous_recognition_streaming_with_overwrite
+
+client = continuous_recognition_streaming_with_overwrite()
