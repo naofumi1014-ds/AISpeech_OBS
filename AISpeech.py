@@ -13,24 +13,9 @@ class AISpeech:
             region=os.environ.get("SPEECH_REGION"),
         )
         speech_config.speech_recognition_language = "ja-JP"
-
-        p = pyaudio.PyAudio()
-
-        print("Available Audio Input Devices:")
-        for i in range(p.get_device_count()):
-            device_info = p.get_device_info_by_index(i)
-            if device_info["maxInputChannels"] > 0:  # 入力デバイスのみ表示
-                print(f"Index {i}: {device_info['name']}")
-
-        p.terminate()
-
-        # マイク入力の設定
-        audio_config = speechsdk.audio.AudioConfig(use_default_microphone=True)
-        print(audio_config)
-
         # 音声認識インスタンスを作成
         self.speech_recognizer = speechsdk.SpeechRecognizer(
-            speech_config=speech_config, audio_config=audio_config
+            speech_config=speech_config
         )
 
         # コールバック関数を登録
