@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WebSocket字幕デモ</title>
+    <style>
+        body {
+            width: 1920px;
+            height: 1080px;
+            margin: 0;
+            overflow: hidden;
+            background: transparent;
+            /* 背景を透過 */
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        #message {
+            position: absolute;
+            bottom: 10px;
+            /* 画面下部に配置 */
+            width: 80%;
+            text-align: center;
+            font-size: 48px;
+            font-weight: bold;
+            color: white;
+            background: rgba(0, 0, 0, 0.8);
+            /* 半透明の黒背景 */
+            padding: 20px;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <p id="message">ここにメッセージが表示されます</p>
+
+    <script>
+        window.addEventListener("DOMContentLoaded", () => {
+            const websocket = new WebSocket("ws://localhost:8765/");
+            websocket.onmessage = ({ data }) => {
+                document.getElementById("message").innerHTML = data;
+            };
+        });
+    </script>
+</body>
+
+</html>
