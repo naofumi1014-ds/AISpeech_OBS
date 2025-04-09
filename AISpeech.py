@@ -1,7 +1,6 @@
 import os
 from dotenv import load_dotenv
 import azure.cognitiveservices.speech as speechsdk
-import threading
 
 class AISpeech:
     def __init__(self):
@@ -12,6 +11,9 @@ class AISpeech:
             subscription=os.environ.get("SPEECH_KEY"),
             region=os.environ.get("SPEECH_REGION"),
         )
+
+        #　セマンティックセグメントを有効化
+        speech_config.set_property(speechsdk.PropertyId.Speech_SegmentationStrategy, "Semantic")
 
         # 言語を設定
         speech_config.speech_recognition_language = "ja-JP"

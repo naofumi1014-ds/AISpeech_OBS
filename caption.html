@@ -36,13 +36,15 @@
 </head>
 
 <body>
-    <p id="message">ここにメッセージが表示されます</p>
+    <p id="message"></p>
 
     <script>
         window.addEventListener("DOMContentLoaded", () => {
             const websocket = new WebSocket("ws://localhost:8765/");
+
             websocket.onmessage = ({ data }) => {
                 document.getElementById("message").innerHTML = data;
+                resetTimer();
             };
         });
     </script>

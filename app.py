@@ -2,32 +2,39 @@ import asyncio
 import websockets
 from AISpeech import AISpeech
 
-async def create_caption(websocket):
-    ai_speech = AISpeech()
-    
-    # 音声認識を開始
-    ai_speech.start_recognition()
+class SpeechWebSocketServer:
+    def __init__(self):
+        self.ai_speech = AISpeech()
+        self.latest_recognizing_text = ""  # 認識中のテキスト
+        self.latest_recognized_text = ""   # 確定したテキスト
 
-    try:
-        while True:
-            # 認識されたテキストを取得
-            # recognized_text = ai_speech.get_recognized_text()
-            recognized_text = ai_speech.get_recognizing_text()
+    async def create_caption(self, websocket):
+        self.ai_speech.start_recognition()
 
-            # もし認識されたテキストがあれば、それを字幕として送信
-            if recognized_text:
-                await websocket.send(f"大沢：{recognized_text}")
-            else:
-                # テキストが認識されていない場合は、タイマーのようなものを送る
-                await websocket.send(f"大沢：字幕テスト")
+        try:
+            while True:
+                recognizing_text = self.ai_speech.get_recognizing_text()
+                recognized_text = self.ai_speech.get_recognized_text()
 
-    except asyncio.CancelledError:
-        # 音声認識を停止
-        ai_speech.stop_recognition()
-        print("音声認識を停止しました")
+                # 認識中のテキストが更新されたら送信
+                if recognizing_text and recognizing_text != self.latest_recognizing_text:
+                    self.latest_recognizing_text = recognizing_text
+                    await websocket.send(f"大沢：{recognizing_text}")  # 認識中メッセージ
+
+                # 確定したテキストが更新されたら送信（認識中の表示を置き換える）
+                if recognized_text and recognized_text != self.latest_recognized_text:
+                    self.latest_recognized_text = recognized_text
+                    await websocket.send(f"大沢：{recognized_text}")  # 確定メッセージ
+
+                await asyncio.sleep(0.1)  # 負荷を抑えるためのスリープ
+
+        except asyncio.CancelledError:
+            self.ai_speech.stop_recognition()
+            print("音声認識を停止しました")
 
 async def main():
-    async with websockets.serve(create_caption, "localhost", 8765):
+    server = SpeechWebSocketServer()
+    async with websockets.serve(server.create_caption, "localhost", 8765):
         await asyncio.Future()  # run forever
 
 if __name__ == "__main__":
